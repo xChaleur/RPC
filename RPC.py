@@ -1,4 +1,3 @@
-#libraries
 import discord
 import random
 import os
@@ -6,8 +5,8 @@ import os
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
-#change this with your Discord BOT Token.
-TOKEN = 'MTI2ODMwODQzOTMxOTQ0OTY3NA.GYLN6r.8o43phQY6VdUmc3UQgKpbn1P8TEgEzBl138Wmk'
+
+TOKEN = 'YMTI2ODMwODQzOTMxOTQ0OTY3NA.Gi2MWz.obqWD0UB1TTJxPYUvpvPCJL2GC86wB4tHUB2bc'
 
 games = {}
 
@@ -70,5 +69,6 @@ async def determine_winner(game_key, channel):
                 f'{result}')
     await channel.send(response)
     del games[game_key]
-#change this with your Discord BOT Token.
-client.run('MTI2ODMwODQzOTMxOTQ0OTY3NA.GYLN6r.8o43phQY6VdUmc3UQgKpbn1P8TEgEzBl138Wmk')
+
+client.run('MTI2ODMwODQzOTMxOTQ0OTY3NA.Gi2MWz.obqWD0UB1TTJxPYUvpvPCJL2GC86wB4tHUB2bc')
+
