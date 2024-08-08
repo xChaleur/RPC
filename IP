@@ -1,0 +1,107 @@
+import tkinter as tk
+from tkinter import messagebox
+import winrm
+
+def change_ip():
+    # Get the input values from the GUI
+    hostname = entry_hostname.get()
+    username = entry_username.get()
+    password = entry_password.get()
+    interface_alias = entry_interface_alias.get()
+    new_ip_address = entry_new_ip.get()
+    subnet_mask = entry_subnet_mask.get()
+    gateway = entry_gateway.get()
+    dns_server = entry_dns.get()
+
+    # Create a session to the Windows VM
+    session = winrm.Session(f'http://{hostname}:5985/wsman', auth=(username, password))
+
+    # PowerShell script to execute
+    ps_script = f"""
+param (
+    [string]$InterfaceAlias,
+    [string]$NewIPAddress,
+    [string]$SubnetMask,
+    [string]$Gateway,
+    [string]$DNSServer
+)
+
+$adapter = Get-NetAdapter -Name $InterfaceAlias
+
+if ($adapter) {{
+    Remove-NetIPAddress -InterfaceAlias $InterfaceAlias -Confirm:$false
+    Remove-NetRoute -InterfaceAlias $InterfaceAlias -Confirm:$false
+
+    New-NetIPAddress -InterfaceAlias $InterfaceAlias -IPAddress $NewIPAddress -PrefixLength $SubnetMask -DefaultGateway $Gateway
+
+    Set-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -ServerAddresses $DNSServer
+
+    Write-Host "IP Address changed to $NewIPAddress with Gateway $Gateway and DNS $DNSServer"
+}} else {{
+    Write-Host "No network adapter found with the name $InterfaceAlias"
+}}
+"""
+    try:
+        # Execute the PowerShell script
+        result = session.run_ps(ps_script, {
+            'InterfaceAlias': interface_alias,
+            'NewIPAddress': new_ip_address,
+            'SubnetMask': subnet_mask,
+            'Gateway': gateway,
+            'DNSServer': dns_server
+        })
+
+        # Display the result in a message box
+        output = result.std_out.decode()
+        error = result.std_err.decode()
+        if output:
+            messagebox.showinfo("Success", output)
+        if error:
+            messagebox.showerror("Error", error)
+
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
+
+# Create the main window
+root = tk.Tk()
+root.title("Change VM Static IP")
+
+# Create and place the labels and entry fields
+tk.Label(root, text="VM Hostname or IP").grid(row=0, column=0)
+entry_hostname = tk.Entry(root)
+entry_hostname.grid(row=0, column=1)
+
+tk.Label(root, text="Username").grid(row=1, column=0)
+entry_username = tk.Entry(root)
+entry_username.grid(row=1, column=1)
+
+tk.Label(root, text="Password").grid(row=2, column=0)
+entry_password = tk.Entry(root, show="*")
+entry_password.grid(row=2, column=1)
+
+tk.Label(root, text="Interface Alias").grid(row=3, column=0)
+entry_interface_alias = tk.Entry(root)
+entry_interface_alias.grid(row=3, column=1)
+
+tk.Label(root, text="New IP Address").grid(row=4, column=0)
+entry_new_ip = tk.Entry(root)
+entry_new_ip.grid(row=4, column=1)
+
+tk.Label(root, text="Subnet Mask (Prefix Length)").grid(row=5, column=0)
+entry_subnet_mask = tk.Entry(root)
+entry_subnet_mask.grid(row=5, column=1)
+
+tk.Label(root, text="Gateway").grid(row=6, column=0)
+entry_gateway = tk.Entry(root)
+entry_gateway.grid(row=6, column=1)
+
+tk.Label(root, text="DNS Server").grid(row=7, column=0)
+entry_dns = tk.Entry(root)
+entry_dns.grid(row=7, column=1)
+
+# Create and place the submit button
+btn_submit = tk.Button(root, text="Change IP", command=change_ip)
+btn_submit.grid(row=8, column=0, columnspan=2)
+
+# Start the GUI loop
+root.mainloop()
