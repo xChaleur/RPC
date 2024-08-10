@@ -20,7 +20,7 @@ async def on_message(message):
     if message.content.lower().startswith('!rps'):
         args = message.content.lower().split()
         if len(args) != 2:
-            await message.channel.send("Usage: !rps @opponent")
+            await message.channel.send("Use !rps \"@\" your opponent")
             return
 
         opponent = message.mentions[0] if message.mentions else None
@@ -45,7 +45,7 @@ async def on_message(message):
                 if game[opponent_id]:
                     await determine_winner(game_key, message.channel)
                 else:
-                    await message.channel.send(f"{message.author.mention} has made their move. Waiting for the opponent.")
+                    await message.channel.send(f"{message.author.mention} has made their move. Waiting for the opponent. Don't be a pussy")
                 return
 
 async def determine_winner(game_key, channel):
@@ -54,13 +54,13 @@ async def determine_winner(game_key, channel):
     user2_choice = games[game_key][user2_id]
 
     if user1_choice == user2_choice:
-        result = "It's a tie!"
+        result = "It's a tie! YAWN!! "
     elif (user1_choice == "rock" and user2_choice == "scissors") or \
          (user1_choice == "paper" and user2_choice == "rock") or \
          (user1_choice == "scissors" and user2_choice == "paper"):
-        result = f"<@{user1_id}> wins!"
+        result = f"<@{user1_id}> wins! But by luck. Unless it's John"
     else:
-        result = f"<@{user2_id}> wins!"
+        result = f"<@{user2_id}> wins! But by luck. Unless it's John"
 
     response = (f'<@{user1_id}> chose: {user1_choice}\n'
                 f'<@{user2_id}> chose: {user2_choice}\n'
