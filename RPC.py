@@ -1,12 +1,10 @@
 import discord
 import random
-import os
+from settings import DISCORD_API_SECRET  # Import the token from settings.py
 
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
-
-TOKEN = 'YMTI2ODMwODQzOTMxOTQ0OTY3NA.Gi2MWz.obqWD0UB1TTJxPYUvpvPCJL2GC86wB4tHUB2bc'
 
 games = {}
 
@@ -24,7 +22,7 @@ async def on_message(message):
         if len(args) != 2:
             await message.channel.send("Usage: !rps @opponent")
             return
-        
+
         opponent = message.mentions[0] if message.mentions else None
         if not opponent or opponent.bot or opponent == message.author:
             await message.channel.send("You must mention a valid user to challenge.")
@@ -70,5 +68,4 @@ async def determine_winner(game_key, channel):
     await channel.send(response)
     del games[game_key]
 
-client.run('MTI2ODMwODQzOTMxOTQ0OTY3NA.Gi2MWz.obqWD0UB1TTJxPYUvpvPCJL2GC86wB4tHUB2bc')
-
+client.run(DISCORD_API_SECRET)  # Use the token from settings.py
